@@ -4,3 +4,4 @@ README.md
 HOW_TO
 prod_file_DB.cpp
 Makefile
+fix_bare_chip_id.cpp
