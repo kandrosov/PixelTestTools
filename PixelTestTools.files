@@ -5,3 +5,4 @@ HOW_TO
 prod_file_DB.cpp
 Makefile
 fix_bare_chip_id.cpp
+merge_bare_module_tests.sh

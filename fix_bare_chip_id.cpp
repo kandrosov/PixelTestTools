@@ -104,15 +104,20 @@ std::shared_ptr<TFile> OpenRootFile(const std::string& file_name)
 
 class Program {
 public:
-    Program(const Config& _config)
-        : config(_config), inputFile(OpenRootFile(_config.inputFileName)),
-          outputFile(CreateRootFile(_config.outputFileName)) {}
 
-    void Run()
+
+    Program(const Config& _config)
+        : config(_config)
     {
         std::unique_ptr<TCanvas> dummy_canvas(new TCanvas()); // workaround to avoid problems with a dictionary for
         /*gErrorIgnoreLevel = kError;*/                       // TPaletteAxis class.
 
+        inputFile = std::shared_ptr<TFile>(OpenRootFile(_config.inputFileName));
+        outputFile = std::shared_ptr<TFile>(CreateRootFile(_config.outputFileName));
+    }
+
+    void Run()
+    {
         CopyDirectory(inputFile.get(), outputFile.get());
     }
 
@@ -122,7 +127,7 @@ private:
         TIter nextkey(source->GetListOfKeys());
         for(TKey* key; (key = dynamic_cast<TKey*>(nextkey()));) {
             const std::string class_name = key->GetClassName();
-            TClass *cl = gROOT->GetClass(class_name.c_str());
+            TClass *cl = gROOT->GetClass(class_name.c_str(), kTRUE, kTRUE);
             if (!cl) continue;
             if (cl->InheritsFrom("TDirectory")) {
                 TDirectory *subdir_source = static_cast<TDirectory*>(source->Get(key->GetName()));
@@ -131,7 +136,7 @@ private:
 
                 CopyDirectory(subdir_source, subdir_destination);
             } else {
-                std::unique_ptr<TObject> original_obj(key->ReadObj());
+                std::unique_ptr<TObject> original_obj(source->Get(key->GetName()));
                 std::unique_ptr<TObject> obj(original_obj->Clone());
                 std::string name = key->GetName();
                 if(cl->InheritsFrom("TNamed"))
