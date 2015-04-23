@@ -1,0 +1,28 @@
+To run the script
+
+_ go to folder /home/pixel/workspace/sensorIV
+_ run the script : ./prod_file_DB.exe BATCHID WAFERID flagSensor1 flagSensor2 flagSensor3
+example: ./prod_file_DB.exe 331152 02 false true true 
+Flags should be consistent with the name of input file. 
+In this case, input file is 33115-02-02-03-IV.dat
+_ if needed, compile with g++ prod_file_DB.cpp -o prod_file_DB.exe
+
+Now you can check that the .tar.gz folders are stored in the folder 
+/home/pixel/workspace/sensorIV/toDataBase
+
+To upload SensorTest_S331152-02-1_new_01.tar.gz to the DB,
+_ go to /home/pixel/workspace/sensorIV/toDataBase
+_ scp -P 23481 SensorTest_S331152-02-1_new_01.tar.gz pisa@cmspixelprod.pi.infn.it:dropbox
+
+The output should look like this:
+
+pixel@CmsPixelTest:~/workspace/sensorIV/toDataBase$ scp -P 23481 SensorTest_S331152-02*_new_01.tar.gz pisa@cmspixelprod.pi.infn.it:dropbox
+
+SensorTest_S331152-02-1_new_01.tar.gz                        100%  838     0.8KB/s   00:00    
+SensorTest_S331152-02-2_new_01.tar.gz                        100% 1052     1.0KB/s   00:00    
+SensorTest_S331152-02-3_new_01.tar.gz                        100% 1053     1.0KB/s   00:00    
+
+
+Pagina web del DB:
+http://cmspixelprod.pi.infn.it/
+       
