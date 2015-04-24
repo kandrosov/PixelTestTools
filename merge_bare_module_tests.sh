@@ -44,7 +44,7 @@ fi
 
 MODULE_ID=$( basename $INPUT_PATH )
 
-CHIPS=$( find "$INPUT_PATH" -type d -maxdepth 1 ! -path "$INPUT_PATH" -print0 | xargs -0 -n 1 basename \
+CHIPS=$( find "$INPUT_PATH" -maxdepth 1 -type d ! -path "$INPUT_PATH" -print0 | xargs -0 -n 1 basename \
     | sed 's/\([0-9]*\).*/\1/' | sort )
 
 DUPLICATES=$( echo "$CHIPS" | uniq -d )

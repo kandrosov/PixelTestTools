@@ -22,6 +22,7 @@
  */
 
 #include <iostream>
+#include <memory>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <TROOT.h>
