@@ -10,3 +10,4 @@ env.sh
 lxplus_env.sh
 run_moreweb.sh
 run_pxar.sh
+upload_bare_module_tests.sh
