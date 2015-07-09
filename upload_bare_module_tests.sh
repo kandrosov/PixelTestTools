@@ -91,12 +91,14 @@ cp -r $TEST_RESULTS_PATH $TEST_RESULTS_UPLOAD_PATH
 MOREWEB_OUTPUT_UPLOAD_PATH="$UPLOADS_PATH/$BUMP_BONDING_DIR/moreweb_output"
 cp -r $MOREWEB_OUTPUT_PATH $MOREWEB_OUTPUT_UPLOAD_PATH
 
-tar czf "$UPLOADS_PATH/$BUMP_BONDING_TAR" "$UPLOADS_PATH/$BUMP_BONDING_DIR"
-tar czf "$UPLOADS_PATH/$PIXEL_ALIVE_TAR" "$UPLOADS_PATH/$PIXEL_ALIVE_DIR"
+cd "$UPLOADS_PATH"
 
-rm -r "$UPLOADS_PATH/$BUMP_BONDING_DIR" "$UPLOADS_PATH/$PIXEL_ALIVE_DIR"
+tar czf "$BUMP_BONDING_TAR" "$BUMP_BONDING_DIR"
+tar czf "$PIXEL_ALIVE_TAR" "$PIXEL_ALIVE_DIR"
 
-scp "$UPLOADS_PATH/$BUMP_BONDING_TAR" cmspixelprod.pi.infn.it:dropbox/
+rm -r "$BUMP_BONDING_DIR" "$PIXEL_ALIVE_DIR"
+
+scp -P 23481 "$BUMP_BONDING_TAR" pisa@cmspixelprod.pi.infn.it:dropbox/
 RESULT=$?
 if [ $RESULT -ne 0 ] ; then
     echo "ERROR: unable to uplad the bump bonding results."
@@ -104,7 +106,7 @@ if [ $RESULT -ne 0 ] ; then
 fi
 echo "The bump bonding results are successfully uploaded."
 
-scp "$UPLOADS_PATH/$PIXEL_ALIVE_TAR" cmspixelprod.pi.infn.it:dropbox/
+scp -P 23481 "$PIXEL_ALIVE_TAR" pisa@cmspixelprod.pi.infn.it:dropbox/
 RESULT=$?
 if [ $RESULT -ne 0 ] ; then
     echo "ERROR: unable to uplad the pixel alive results."
