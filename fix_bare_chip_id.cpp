@@ -105,8 +105,6 @@ std::shared_ptr<TFile> OpenRootFile(const std::string& file_name)
 
 class Program {
 public:
-
-
     Program(const Config& _config)
         : config(_config)
     {
@@ -160,10 +158,16 @@ private:
 
     std::string ReplaceChipId(const std::string& name) const
     {
+        static const std::set<std::string> special_names = { "ha", "hd" };
         const std::string old_chip_name = GetChipName(config.oldChipId);
         const std::string new_chip_name = GetChipName(config.newChipId);
-        std::string new_name = name;
-        boost::replace_all(new_name, old_chip_name, new_chip_name);
+        std::string new_name;
+        if(special_names.count(name)) {
+            new_name = name + "_" + new_chip_name;
+        } else {
+            new_name = name;
+            boost::replace_all(new_name, old_chip_name, new_chip_name);
+        }
         return new_name;
     }
 
@@ -184,7 +188,6 @@ const int ERROR_EXIT_CODE = 1;
 const int PRINT_ARGS_EXIT_CODE = 2;
 
 } // anonymous namespace
-
 
 int main(int argc, char* argv[])
 {
