@@ -56,13 +56,22 @@ for t_slice in time_slices:
     canvas.Print(output_file_name, 'Title:' + title)
 
 
-[up_region_x, up_region_y] = [35, 122]
-[down_region_x, down_region_y] = [35, 60]
-[region_size_x, region_size_y] = [170, 15]
-[control_region_x, control_region_y, control_region_size_x, control_region_size_y] = [118, 192, 6, 8]
+# [up_region_x, up_region_y] = [35, 122]
+# [down_region_x, down_region_y] = [35, 60]
+# [region_size_x, region_size_y] = [170, 15]
+# [control_region_x, control_region_y, control_region_size_x, control_region_size_y] = [118, 192, 6, 8]
+# nbins = [20, 30, 40, 40, 40]
+# limits = [ [21, 24], [21, 60], [21, 70], [21, 70], [21, 70] ]
+# sf = [1.3, 2.2, 2, 1.8, 2]
+
+[up_region_x, up_region_y] = [45, 99]
+[down_region_x, down_region_y] = [45, 39]
+[region_size_x, region_size_y] = [178, 15]
+[control_region_x, control_region_y, control_region_size_x, control_region_size_y] = [131, 179, 8, 21]
 nbins = [20, 30, 40, 40, 40]
-limits = [ [21, 24], [21, 60], [21, 70], [21, 70], [21, 70] ]
-sf = [1.3, 2.2, 2, 1.8, 2]
+limits = [ [20, 24], [20, 40], [20, 40], [20, 40], [20, 40] ]
+sf = [1.3, 1.5, 2, 1.8, 2]
+
 
 for n in range(0, len(time_slices)):
     t_slice = time_slices[n]
@@ -116,7 +125,7 @@ for n in range(0, len(time_slices)):
     canvas.Draw()
     canvas.Print(output_file_name, 'Title:' + title)
 
-title = 'Average temperature evolution the selected regions'
+title = 'Average temperature evolution in the selected regions'
 data.GetZaxis().SetRange()
 hist_down_time = data.ProjectionZ("down_time", up_region_x, up_region_x + region_size_x,
                                                up_region_y, up_region_y + region_size_y)
