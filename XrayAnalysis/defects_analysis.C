@@ -79,17 +79,29 @@ RocDefects Parse_Failures(const std::string& failure){
 }
 
 void defects_analysis(){
+  TFile* f_out = new TFile("defects_analysis_Pisa.root","RECREATE");
+  f_out->mkdir("A");
+  f_out->mkdir("B");
+  
   TH1F* pa_xray_diffH_[16];
   TH2D* pa_xray_diff2DH_[16];
   TH2D* pa_bb_vs_xray2DH_[16];
-  TH1F* pa_xray_diffTotalH_ = new TH1F("pa_xray_diffTotal","pa -Xray (Total)",71,-0.5,70.5);
-  TH2D* pa_xray_diffTotal2DH_ = new TH2D("pa_xray_diffTotal2D","pa -Xray vs pa (Total)",71,-0.5,70.5,71,-0.5,70.5);
-  pa_xray_diffTotal2DH_->GetXaxis()->SetTitle("Total no. of PA Failures");
-  pa_xray_diffTotal2DH_->GetYaxis()->SetTitle("No. of PA Failures not in X Ray Faiure");
-
-  TH2D* pa_bb_vs_xrayTotal2DH_ = new TH2D("pa_bb_vs_xrayTotal2D","pa+bb vs xray (total)",71,-0.5,70.5,71,-0.5,70.5);
-  pa_bb_vs_xrayTotal2DH_->GetYaxis()->SetTitle("no. of pa+bb  failures");
-  pa_bb_vs_xrayTotal2DH_->GetXaxis()->SetTitle("no. of xray failures");
+  TH1F* pa_xray_diffTotal_GradeAH_ = new TH1F("pa_xray_diffTotal_GradeA","pa -Xray (Total)",71,-0.5,70.5);
+  TH2D* pa_xray_diffTotal2D_GradeAH_ = new TH2D("pa_xray_diffTotal2D_GradeA","pa -Xray vs pa (Total)",71,-0.5,70.5,71,-0.5,70.5);
+  pa_xray_diffTotal2D_GradeAH_->GetXaxis()->SetTitle("Total no. of PA Failures");
+  pa_xray_diffTotal2D_GradeAH_->GetYaxis()->SetTitle("No. of PA Failures not in X Ray Faiure");
+  TH2D* pa_bb_vs_xrayTotal2D_GradeAH_ = new TH2D("pa_bb_vs_xrayTotal2D_GardeA","pa+bb vs xray (total)",71,-0.5,70.5,71,-0.5,70.5);
+  pa_bb_vs_xrayTotal2D_GradeAH_->GetYaxis()->SetTitle("no. of pa+bb  failures");
+  pa_bb_vs_xrayTotal2D_GradeAH_->GetXaxis()->SetTitle("no. of xray failures");
+  
+  TH1F* pa_xray_diffTotal_GradeBH_ = new TH1F("pa_xray_diffTotal_GradeB","pa -Xray (Total)",71,-0.5,70.5);
+  TH2D* pa_xray_diffTotal2D_GradeBH_ = new TH2D("pa_xray_diffTotal2D_GradeB","pa -Xray vs pa (Total)",71,-0.5,70.5,71,-0.5,70.5);
+  pa_xray_diffTotal2D_GradeBH_->GetXaxis()->SetTitle("Total no. of PA Failures");
+  pa_xray_diffTotal2D_GradeBH_->GetYaxis()->SetTitle("No. of PA Failures not in X Ray Faiure");
+  TH2D* pa_bb_vs_xrayTotal2D_GradeBH_ = new TH2D("pa_bb_vs_xrayTotal2D_GardeB","pa+bb vs xray (total)",71,-0.5,70.5,71,-0.5,70.5);
+  pa_bb_vs_xrayTotal2D_GradeBH_->GetYaxis()->SetTitle("no. of pa+bb  failures");
+  pa_bb_vs_xrayTotal2D_GradeBH_->GetXaxis()->SetTitle("no. of xray failures");
+  
   for(int i=0;i<16;i++){
     std::ostringstream convert;
     convert << i;
@@ -110,31 +122,32 @@ void defects_analysis(){
     pa_bb_vs_xray2DH_[i]->GetXaxis()->SetTitle("no. of xray failures");
 
   }
-  TFile* f_out = new TFile("defects_analysis.root","RECREATE");
   std::ifstream in_file("defects.txt");
   std::string line;
   int line_no=1;
   if(in_file.is_open()){ 
     while(getline(in_file,line)){
       //if(line_no >1 ) break;
-      std::cout<<" Reading line no"<<line_no<<std::endl;
+      //std::cout<<" Reading line no"<<line_no<<std::endl;
       line_no++;
       std::vector<std::string> columns;
       boost::trim_if(line, boost::is_any_of(" \t"));
       boost::split(columns, line, boost::is_any_of("\t"), boost::token_compress_off);
-      if(columns.size() != 6) {
+      if(columns.size() != 8) {
 	std::cerr<<" Bad No. Columns "<<columns.size()<<std::endl;
 	continue;
       }
-      const std::string& center = columns.at(0);
-      if(center == "center"){
-	continue;
-      }
-      const std::string& full_module_id = columns.at(1);
-      const std::string& bare_module_id = columns.at(2);
-      std::string xray_failures = columns.at(3);
-      std::string bb_failures = columns.at(4);
-      std::string pa_failures = columns.at(5); 
+      const std::string& center_bare = columns.at(0);
+      if(center_bare != "Pisa") continue;
+      const std::string& center_xray = columns.at(1);
+      if(center_xray != "PERUGIA") continue;
+      const std::string& full_module_id = columns.at(2);
+      const std::string& bare_module_id = columns.at(3);
+      const std::string& final_grade = columns.at(4);
+      if(final_grade != "A" && final_grade != "B") continue;
+      std::string xray_failures = columns.at(5);
+      std::string bb_failures = columns.at(6);
+      std::string pa_failures = columns.at(7); 
       size_t found_1 = xray_failures.find("{");
       size_t found_2 = xray_failures.find("}",found_1);
       if(found_1 == std::string::npos || found_2 ==std::string::npos){ 
@@ -176,9 +189,16 @@ void defects_analysis(){
 	const PosSet& pa_set = entry.second;
 	if(!xrayFailures.count(Roc_id)){
 	  pa_xray_diffH_[Roc_id]->Fill(pa_set.size());
-	  pa_xray_diffTotalH_->Fill(pa_set.size());
 	  pa_xray_diff2DH_[Roc_id]->Fill(pa_set.size(),pa_set.size());
-	  pa_xray_diffTotal2DH_->Fill(pa_set.size(),pa_set.size());
+	  
+	  if(final_grade == "A"){
+	    pa_xray_diffTotal_GradeAH_->Fill(pa_set.size());
+	    pa_xray_diffTotal2D_GradeAH_->Fill(pa_set.size(),pa_set.size());
+	  }
+	  else if(final_grade == "B"){
+	    pa_xray_diffTotal_GradeBH_->Fill(pa_set.size());
+	    pa_xray_diffTotal2D_GradeBH_->Fill(pa_set.size(),pa_set.size());
+	  }
 	  continue;
         }
 	const PosSet& xray_set = xrayFailures.at(Roc_id);
@@ -186,10 +206,18 @@ void defects_analysis(){
 	std::vector<Pos>::iterator it;
 	it = std::set_difference(pa_set.begin(),pa_set.end(),xray_set.begin(),xray_set.end(),v.begin());
 	v.resize(it-v.begin());
+	if(v.size()>0) std::cout<<" Module Id = "<<full_module_id<<" Bare Module Id = "<<bare_module_id<<" ROC ID = "<<Roc_id<<" No. of Pa Failure = "<<pa_set.size()<<" No. of Xray Failure = "<<xray_set.size()<<" No. of difference = "<<v.size()<<std::endl;
 	pa_xray_diffH_[Roc_id]->Fill(v.size());
-	pa_xray_diffTotalH_->Fill(v.size());
 	pa_xray_diff2DH_[Roc_id]->Fill(pa_set.size(),v.size());
-	pa_xray_diffTotal2DH_->Fill(pa_set.size(),v.size());
+
+	if(final_grade == "A"){
+	  pa_xray_diffTotal_GradeAH_->Fill(v.size());
+	  pa_xray_diffTotal2D_GradeAH_->Fill(pa_set.size(),v.size());
+	}
+        else if(final_grade == "B"){
+	  pa_xray_diffTotal_GradeBH_->Fill(v.size());
+	  pa_xray_diffTotal2D_GradeBH_->Fill(pa_set.size(),v.size());
+	}
       }
       for(int i=0;i<16;i++){
 	int nXrayFailure;
@@ -200,7 +228,8 @@ void defects_analysis(){
 	if(bbFailures.count(i))
 	  bareFailures.insert(bbFailures.at(i).begin(),bbFailures.at(i).end());
 	pa_bb_vs_xray2DH_[i]->Fill(nXrayFailure,bareFailures.size());
-	pa_bb_vs_xrayTotal2DH_->Fill(nXrayFailure,bareFailures.size());
+	if(final_grade == "A") pa_bb_vs_xrayTotal2D_GradeAH_->Fill(nXrayFailure,bareFailures.size());
+	else if(final_grade == "B") pa_bb_vs_xrayTotal2D_GradeBH_->Fill(nXrayFailure,bareFailures.size()); 
       }
     }
   }
@@ -210,9 +239,17 @@ void defects_analysis(){
     pa_xray_diff2DH_[i]->Write();
     pa_bb_vs_xray2DH_[i]->Write();
   }
-  pa_xray_diffTotalH_->Write();
-  pa_xray_diffTotal2DH_->Write();
-  pa_bb_vs_xrayTotal2DH_->Write();
+
+  f_out->cd("A");
+  pa_xray_diffTotal_GradeAH_->Write();
+  pa_xray_diffTotal2D_GradeAH_->Write();
+  pa_bb_vs_xrayTotal2D_GradeAH_->Write();
+
+  f_out->cd("B");
+  pa_xray_diffTotal_GradeBH_->Write();
+  pa_xray_diffTotal2D_GradeBH_->Write();
+  pa_bb_vs_xrayTotal2D_GradeBH_->Write();
+  
   f_out->Close();
 }
 int main(){
